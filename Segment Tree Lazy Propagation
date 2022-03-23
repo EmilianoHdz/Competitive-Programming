@@ -1,0 +1,72 @@
+struct segmentTree{
+    long long value;
+    long long lazy;
+    segmentTree *left, *right;
+    segmentTree(){
+        value=0;
+        lazy=0;
+        left=nullptr;
+        right=nullptr;
+    }
+};
+
+segmentTree* build(int i, int j, int arreglo[]){
+    segmentTree *root=new segmentTree();
+    if(i==j){
+        root->value=arreglo[i];
+        return root;
+    }
+    int mitad=(i+j)/2;
+    root->left=build(i,mitad,arreglo);
+    root->right=build(mitad+1,j,arreglo);
+    root->value=root->left->value+root->right->value;
+    return root;
+}
+
+long long answer(segmentTree *current, int i, int j, int idxQ1, int idxQ2){
+    if(i>idxQ2 || j<idxQ1)return 0;
+    if(i>=idxQ1 && j<=idxQ2)return current->value;
+    int mitad=(i+j)/2;
+    if(current->lazy>0){
+        if(current->left!=nullptr){
+            current->left->value+=(mitad-i+1)*current->lazy;
+            current->left->lazy+=current->lazy;
+        }
+        if(current->right!=nullptr){
+            current->right->value+=(j-(mitad+1)+1)*current->lazy;
+            current->right->lazy+=current->lazy;
+        }
+        current->lazy=0;
+    }
+    return answer(current->left,i,mitad,idxQ1,idxQ2)+answer(current->right,mitad+1,j,idxQ1,idxQ2);
+}
+
+segmentTree* update(segmentTree* current ,int i, int j, int idxUpdate1, int idxUpdate2, int numero){
+    if(i>idxUpdate2 || j<idxUpdate1)return current;//si se sale de los limites
+    if(i==j && i>=idxUpdate1 && i<=idxUpdate2){
+        current->value+=numero;
+        return current;
+    }
+    if(i>=idxUpdate1 && j<=idxUpdate2){
+        current->value+=(j-i+1)*numero;
+        current->lazy+=numero;
+        return current;
+    }
+    int mitad=(i+j)/2;
+    //Bajar el lazy a mis hijos si es necesario
+    if(current->lazy>0){
+        if(current->left!=nullptr){
+            current->left->value+=(mitad-i+1)*current->lazy;
+            current->left->lazy+=current->lazy;
+        }
+        if(current->right!=nullptr){
+            current->right->value+=(j-(mitad+1)+1)*current->lazy;
+            current->right->lazy+=current->lazy;
+        }
+        current->lazy=0;
+    }
+    //-------
+    current->left=update(current->left,i,mitad,idxUpdate1,idxUpdate2,numero);
+    current->right=update(current->right,mitad+1,j,idxUpdate1,idxUpdate2,numero);
+    return current;
+}
