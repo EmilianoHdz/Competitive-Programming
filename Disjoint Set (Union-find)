@@ -1,0 +1,25 @@
+int findd(int num, vector<int> &padres){
+    if(padres[num]!=num){
+        padres[num]=findd(padres[num],padres);
+    }
+    return padres[num];
+}
+ 
+bool isConnected(int num1, int num2, vector<int> &padres){
+    return (findd(num1,padres)==findd(num2,padres));
+}
+ 
+void unionn(int num1, int num2, vector<int> &padres, vector<int> &alturas){
+    if(isConnected(num1,num2,padres)){
+        return;
+    }
+    int padre1=findd(num1,padres);
+    int padre2=findd(num2,padres);
+    if(alturas[padre1]>=alturas[padre2]){
+        alturas[padre1]+=alturas[padre2];
+        padres[padre2]=padre1;
+    }else{
+        alturas[padre2]+=alturas[padre1];
+        padres[padre1]=padre2;
+    }
+}
