@@ -1,0 +1,38 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+const long long INF=30000;
+
+#define IOS ios_base::sync_with_stdio(0); cin.tie(0);
+
+int main(){
+    IOS;
+    int n,m;
+    cin>>n>>m;
+    //from, to, weight
+    vector<tuple<int,int,int>> edges(m);
+    for(int i=0; i<m; i++){
+        int a,b,c;
+        cin>>a>>b>>c;
+        edges[i]={a,b,c};
+    }
+    vector<int> bellmanFord(n+1,INF);
+    bellmanFord[1]=0;
+    for(int i=0; i<n; i++){
+        for(int j=0; j<m; j++){
+            int from=get<0>(edges[j]);
+            int to=get<1>(edges[j]);
+            int weight=get<2>(edges[j]);
+            if(bellmanFord[from]!=INF){
+                bellmanFord[to]=min(bellmanFord[to],bellmanFord[from]+weight);
+            }
+        }
+    }
+    cout<<0;
+    for(int i=2; i<=n; i++){
+        cout<<" "<<bellmanFord[i];
+    }
+    cout<<'\n';
+    return 0;
+}
