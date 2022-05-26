@@ -1,25 +1,27 @@
-int findd(int num, vector<int> &padres){
-    if(padres[num]!=num){
-        padres[num]=findd(padres[num],padres);
+int findd(int a, vector<int> &parents){
+    if(parents[a]!=a){
+        parents[a]=findd(parents[a],parents);
     }
-    return padres[num];
+    return parents[a];
 }
- 
-bool isConnected(int num1, int num2, vector<int> &padres){
-    return (findd(num1,padres)==findd(num2,padres));
+
+bool isConnected(int a, int b, vector<int> &fathers){
+    return findd(a,fathers)==findd(b,fathers);
 }
- 
-void unionn(int num1, int num2, vector<int> &padres, vector<int> &alturas){
-    if(isConnected(num1,num2,padres)){
-        return;
-    }
-    int padre1=findd(num1,padres);
-    int padre2=findd(num2,padres);
-    if(alturas[padre1]>=alturas[padre2]){
-        alturas[padre1]+=alturas[padre2];
-        padres[padre2]=padre1;
+
+void unionn(int a, int b, vector<int> &fathers, vector<int> &sizee){
+    if(isConnected(a,b,fathers))return;
+    int parentA=findd(a,fathers);
+    int parentB=findd(b,fathers);
+
+    if(sizee[parentA]>sizee[parentB]){
+        fathers[parentB]=parentA;
+    }else if(sizee[parentA]<sizee[parentB]){
+        fathers[parentA]=parentB;
     }else{
-        alturas[padre2]+=alturas[padre1];
-        padres[padre1]=padre2;
+        sizee[parentA]++;
+        fathers[parentB]=parentA;
     }
 }
+
+//Complejidad ---> Funcion Inversa Ackermann
