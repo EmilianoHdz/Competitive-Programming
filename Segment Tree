@@ -1,0 +1,44 @@
+struct segmentTree{
+    long long value;
+    segmentTree *left, *right;
+    segmentTree(){
+        value=0;
+        left=nullptr;
+        right=nullptr;
+    }
+};
+ 
+segmentTree* build(int i, int j, int arreglo[]){
+    segmentTree *root=new segmentTree();
+    if(i==j){
+        root->value=arreglo[i];
+        return root;
+    }
+    int mitad=(i+j)/2;
+    root->left=build(i,mitad,arreglo);
+    root->right=build(mitad+1,j,arreglo);
+    root->value=root->left->value+root->right->value;
+    return root;
+}
+ 
+long long answer(segmentTree *current, int i, int j, int idxQ1, int idxQ2){
+    if(i>idxQ2 || j<idxQ1)return 0;
+    if(i>=idxQ1 && j<=idxQ2)return current->value;
+    int mitad=(i+j)/2;
+    return answer(current->left,i,mitad,idxQ1,idxQ2)+answer(current->right,mitad+1,j,idxQ1,idxQ2);
+}
+ 
+segmentTree* update(segmentTree *root, int i, int j, int value, int idx){
+    if(i==j && i==idx){
+        root->value=value;
+        return root;
+    }
+    int mitad=(i+j)/2;
+    if(i<=idx && mitad>=idx){
+        root->left=update(root->left,i,mitad,value,idx);
+    }else{
+        root->right=update(root->right,mitad+1,j,value,idx);
+    }
+    root->value=root->left->value+root->right->value;
+    return root;
+}
