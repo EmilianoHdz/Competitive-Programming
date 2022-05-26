@@ -1,0 +1,26 @@
+void tarjan(const vector<vector<int>> &adjList, vector<int> &dfs_low, vector<int> &dfs_num,
+             vector<char> &onStack, vector<char> &visited, stack<int> &S, int from, vector<int> &answer){
+    dfs_low[from]=dfs_num[from]=++idxDfs;
+    onStack[from]='y';
+    visited[from]='y';
+    S.push(from);
+    for(int to:adjList[from]){
+        if(visited[to]=='n'){
+            tarjan(adjList,dfs_low,dfs_num,onStack,visited,S,to,answer);
+        }
+        if(onStack[to]=='y')dfs_low[from]=min(dfs_low[from],dfs_low[to]);
+    }
+    if(dfs_low[from]==dfs_num[from]){
+        kingdoms++;
+        while(!S.empty() && S.top()!=from){
+            int to=S.top();
+            S.pop();
+            dfs_low[to]=dfs_low[from];
+            onStack[to]='n';
+            answer[to]=kingdoms;
+        }
+        onStack[from]='n';
+        S.pop();
+        answer[from]=kingdoms;
+    }
+}
