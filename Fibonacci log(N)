@@ -1,0 +1,51 @@
+ll arreglo[(int)1e6+5];
+
+vector<vector<ll>> fib={{0,1},{1,1}};
+vector<vector<ll>> ans(2,vector<ll>(2));
+vector<vector<ll>> aux(2,vector<ll>(2));
+
+void moveFibonacci(vector<vector<ll>> &m2){
+    ll x =((m2[0][0]*m2[0][0])+(m2[0][1]*m2[1][0]))%MOD;
+    ll y =((m2[0][0]*m2[0][1])+(m2[0][1]*m2[1][1]))%MOD;
+    ll z =((m2[1][0]*m2[0][0])+(m2[1][1]*m2[0][1]))%MOD;
+    ll w =((m2[1][0]*m2[0][1])+(m2[1][1]*m2[1][1]))%MOD;
+    m2[0][0]=x;
+    m2[0][1]=y;
+    m2[1][0]=z;
+    m2[1][1]=w;
+}
+
+void multiplyMatrix(vector<vector<ll>> &m1, const vector<vector<ll>> &m2){
+    ll x =((m1[0][0]*m2[0][0])+(m1[0][1]*m2[1][0]))%MOD;
+    ll y =((m1[0][0]*m2[0][1])+(m1[0][1]*m2[1][1]))%MOD;
+    ll z =((m1[1][0]*m2[0][0])+(m1[1][1]*m2[0][1]))%MOD;
+    ll w =((m1[1][0]*m2[0][1])+(m1[1][1]*m2[1][1]))%MOD;
+    m1[0][0]=x;
+    m1[0][1]=y;
+    m1[1][0]=z;
+    m1[1][1]=w;
+}
+
+ll getFibonacci(ll potencia){
+    if(potencia<=1)return 1;
+    ///Inicializar matriz resultado
+    ans[0][0]=1;
+    ans[0][1]=0;
+    ans[1][0]=0;
+    ans[1][1]=1;
+    ///Inicializar matriz auxiliar
+    aux[0][0]=0;
+    aux[0][1]=1;
+    aux[1][0]=1;
+    aux[1][1]=1;
+
+    while(potencia>0){
+        if(potencia&1){
+            multiplyMatrix(ans,aux);
+        }
+        moveFibonacci(aux);
+        potencia/=2;
+    }
+
+    return ans[1][1];
+}
