@@ -1,0 +1,22 @@
+// nCr % k where k is prime
+// lucas theorem
+
+ll MOD=1e9+7;
+ll maximo=1e6+5;
+
+vector<ll> fact(maximo,1);
+vector<ll> inv(maximo,1);
+vector<ll> invFact(maximo,1);
+
+void precalculo(){
+    for(ll i=2; i<maximo; i++){
+        fact[i]=i*fact[i-1]%MOD;
+        inv[i]=MOD-(MOD/i)*inv[MOD%i]%MOD;
+        invFact[i]=inv[i]*invFact[i-1]%MOD;
+    }
+}
+
+ll nCr(ll n, ll r){
+    if(r<0 || n<r) return 0;
+    return ((fact[n]*invFact[n-r])%MOD*invFact[r])%MOD;
+}
