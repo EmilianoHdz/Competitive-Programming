@@ -1,72 +1,79 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define ll long long
+
+const ll MOD = (ll)1e9+7;
+
 struct segmentTree{
-    long long value;
-    long long lazy;
-    segmentTree *left, *right;
+    ll sum;
+    ll lazy;
+    segmentTree *izq, *der;
     segmentTree(){
-        value=0;
-        lazy=0;
-        left=nullptr;
-        right=nullptr;
+        suma_cuadrados = 0;
+        ll sum = 0;
+        ll lazy = 0;
+        izq = nullptr;
+        der = nullptr;
     }
 };
 
-segmentTree* build(int i, int j, int arreglo[]){
-    segmentTree *root=new segmentTree();
+segmentTree* build(ll i, ll j, ll arreglo[]){
+    segmentTree *root = new segmentTree();
+    root->lazy=0;
     if(i==j){
-        root->value=arreglo[i];
+        root->sum = (arreglo[i]%MOD);
         return root;
     }
-    int mitad=(i+j)/2;
-    root->left=build(i,mitad,arreglo);
-    root->right=build(mitad+1,j,arreglo);
-    root->value=root->left->value+root->right->value;
+    ll mitad = (i+j)/2;
+    root->izq = build(i,mitad,arreglo);
+    root->der = build(mitad+1,j,arreglo);
+    root->sum = (root->izq->sum + root->der->sum)%MOD;
     return root;
 }
 
-long long answer(segmentTree *current, int i, int j, int idxQ1, int idxQ2){
+long long answer(segmentTree *current, ll i, ll j, const ll idxQ1, const ll idxQ2){
     if(i>idxQ2 || j<idxQ1)return 0;
-    if(i>=idxQ1 && j<=idxQ2)return current->value;
-    int mitad=(i+j)/2;
+    if(i>=idxQ1 && j<=idxQ2){
+        return (current->sum)%MOD;
+    }
+    ll mitad=(i+j)/2;
     if(current->lazy>0){
-        if(current->left!=nullptr){
-            current->left->value+=(mitad-i+1)*current->lazy;
-            current->left->lazy+=current->lazy;
+        if(current->izq!= nullptr){
+            current->izq->sum = (current->izq->sum+((mitad-i+1)*current->lazy)%MOD)%MOD;
+            current->izq->lazy = (current->izq->lazy+current->lazy)%MOD;
         }
-        if(current->right!=nullptr){
-            current->right->value+=(j-(mitad+1)+1)*current->lazy;
-            current->right->lazy+=current->lazy;
+        if(current->der!= nullptr){
+            current->der->sum = (current->der->sum + ((j-(mitad+1)+1)*current->lazy)%MOD)%MOD;
+            current->der->lazy = (current->der->lazy +current->lazy)%MOD;
         }
         current->lazy=0;
+
     }
-    return answer(current->left,i,mitad,idxQ1,idxQ2)+answer(current->right,mitad+1,j,idxQ1,idxQ2);
+    return (answer(current->izq,i,mitad,idxQ1,idxQ2) + answer(current->der,mitad+1,j,idxQ1,idxQ2))%MOD;
 }
 
-segmentTree* update(segmentTree* current ,int i, int j, int idxUpdate1, int idxUpdate2, int numero){
-    if(i>idxUpdate2 || j<idxUpdate1)return current;//si se sale de los limites
-    if(i==j && i>=idxUpdate1 && i<=idxUpdate2){
-        current->value+=numero;
+segmentTree* update(segmentTree* current, ll i, ll j, const ll idxQ1, const ll idxQ2, const ll numero){
+    if(i>idxQ2 || j<idxQ1) return current;
+    if(i>=idxQ1 && j<=idxQ2){
+        current->sum = (current->sum + ((j-i+1)*numero)%MOD)%MOD;
+        current->lazy = (current->lazy + numero)%MOD;
         return current;
     }
-    if(i>=idxUpdate1 && j<=idxUpdate2){
-        current->value+=(j-i+1)*numero;
-        current->lazy+=numero;
-        return current;
-    }
-    int mitad=(i+j)/2;
-    //Bajar el lazy a mis hijos si es necesario
+    ll mitad = (i+j)/2;
     if(current->lazy>0){
-        if(current->left!=nullptr){
-            current->left->value+=(mitad-i+1)*current->lazy;
-            current->left->lazy+=current->lazy;
+        if(current->izq != nullptr){
+            current->izq->sum = (current->izq->suml + ((mitad-i+1)*current->lazy)%MOD)%MOD;
+            current->izq->lazy = (current->izq->lazy + current->lazy)%MOD;
         }
-        if(current->right!=nullptr){
-            current->right->value+=(j-(mitad+1)+1)*current->lazy;
-            current->right->lazy+=current->lazy;
+        if(current->der != nullptr){
+            current->der->sum = (current->der->sum + ((j-(mitad+1)+1)*current->lazy)%MOD)%MOD;
+            current->der->lazy = (current->der->lazy + current->lazy)%MOD;
         }
         current->lazy=0;
     }
-    //-------
-    current->left=update(current->left,i,mitad,idxUpdate1,idxUpdate2,numero);
-    current->right=update(current->right,mitad+1,j,idxUpdate1,idxUpdate2,numero);
-    return current;
-}
+    current->izq= update(current->izq,i,mitad,idxQ1, idxQ2, numero);
+    current->der= update(current->der,mitad+1,j,idxQ1, idxQ2, numero);
+    current->suma_normal= (current->izq->suma_normal+current->der->suma_normal)%MOD;
+  
