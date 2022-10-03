@@ -28,12 +28,12 @@ void multiplyMatrix(vector<vector<ll>> &m1, const vector<vector<ll>> &m2){
 
 ll getFibonacci(ll potencia){
     if(potencia<=1)return 1;
-    ///Inicializar matriz resultado
+    ///Initialize ans matrix
     ans[0][0]=1;
     ans[0][1]=0;
     ans[1][0]=0;
     ans[1][1]=1;
-    ///Inicializar matriz auxiliar
+    ///Initialize aux matrix
     aux[0][0]=0;
     aux[0][1]=1;
     aux[1][0]=1;
