@@ -24,4 +24,4 @@ void unionn(int a, int b, vector<int> &fathers, vector<int> &sizee){
     }
 }
 
-//Complejidad ---> Funcion Inversa Ackermann
+//Complexity --->Ackermann Function
