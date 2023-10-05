@@ -1,5 +1,3 @@
-ll arreglo[(int)1e6+5];
-
 vector<vector<ll>> fib={{0,1},{1,1}};
 vector<vector<ll>> ans(2,vector<ll>(2));
 vector<vector<ll>> aux(2,vector<ll>(2));
