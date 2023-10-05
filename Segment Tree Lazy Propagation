@@ -9,13 +9,12 @@ const ll MOD = (ll)1e9+7;
 struct segmentTree{
     ll sum;
     ll lazy;
-    segmentTree *izq, *der;
+    segmentTree *left, *right;
     segmentTree(){
-        suma_cuadrados = 0;
         ll sum = 0;
         ll lazy = 0;
-        izq = nullptr;
-        der = nullptr;
+        left = nullptr;
+        right = nullptr;
     }
 };
 
@@ -26,10 +25,10 @@ segmentTree* build(ll i, ll j, ll arreglo[]){
         root->sum = (arreglo[i]%MOD);
         return root;
     }
-    ll mitad = (i+j)/2;
-    root->izq = build(i,mitad,arreglo);
-    root->der = build(mitad+1,j,arreglo);
-    root->sum = (root->izq->sum + root->der->sum)%MOD;
+    ll mid = (i+j)/2;
+    root->left = build(i,mid,arreglo);
+    root->right = build(mid+1,j,arreglo);
+    root->sum = (root->left->sum + root->right->sum)%MOD;
     return root;
 }
 
@@ -38,20 +37,20 @@ long long answer(segmentTree *current, ll i, ll j, const ll idxQ1, const ll idxQ
     if(i>=idxQ1 && j<=idxQ2){
         return (current->sum)%MOD;
     }
-    ll mitad=(i+j)/2;
+    ll mid=(i+j)/2;
     if(current->lazy>0){
-        if(current->izq!= nullptr){
-            current->izq->sum = (current->izq->sum+((mitad-i+1)*current->lazy)%MOD)%MOD;
-            current->izq->lazy = (current->izq->lazy+current->lazy)%MOD;
+        if(current->left!= nullptr){
+            current->left->sum = (current->left->sum+((mid-i+1)*current->lazy)%MOD)%MOD;
+            current->left->lazy = (current->left->lazy+current->lazy)%MOD;
         }
-        if(current->der!= nullptr){
-            current->der->sum = (current->der->sum + ((j-(mitad+1)+1)*current->lazy)%MOD)%MOD;
-            current->der->lazy = (current->der->lazy +current->lazy)%MOD;
+        if(current->right!= nullptr){
+            current->right->sum = (current->right->sum + ((j-(mid+1)+1)*current->lazy)%MOD)%MOD;
+            current->right->lazy = (current->right->lazy +current->lazy)%MOD;
         }
         current->lazy=0;
 
     }
-    return (answer(current->izq,i,mitad,idxQ1,idxQ2) + answer(current->der,mitad+1,j,idxQ1,idxQ2))%MOD;
+    return (answer(current->left,i,mid,idxQ1,idxQ2) + answer(current->right,mid+1,j,idxQ1,idxQ2))%MOD;
 }
 
 segmentTree* update(segmentTree* current, ll i, ll j, const ll idxQ1, const ll idxQ2, const ll numero){
@@ -61,19 +60,19 @@ segmentTree* update(segmentTree* current, ll i, ll j, const ll idxQ1, const ll i
         current->lazy = (current->lazy + numero)%MOD;
         return current;
     }
-    ll mitad = (i+j)/2;
+    ll mid = (i+j)/2;
     if(current->lazy>0){
-        if(current->izq != nullptr){
-            current->izq->sum = (current->izq->suml + ((mitad-i+1)*current->lazy)%MOD)%MOD;
-            current->izq->lazy = (current->izq->lazy + current->lazy)%MOD;
+        if(current->left != nullptr){
+            current->left->sum = (current->left->suml + ((mid-i+1)*current->lazy)%MOD)%MOD;
+            current->left->lazy = (current->left->lazy + current->lazy)%MOD;
         }
-        if(current->der != nullptr){
-            current->der->sum = (current->der->sum + ((j-(mitad+1)+1)*current->lazy)%MOD)%MOD;
-            current->der->lazy = (current->der->lazy + current->lazy)%MOD;
+        if(current->right != nullptr){
+            current->right->sum = (current->right->sum + ((j-(mid+1)+1)*current->lazy)%MOD)%MOD;
+            current->right->lazy = (current->right->lazy + current->lazy)%MOD;
         }
         current->lazy=0;
     }
-    current->izq= update(current->izq,i,mitad,idxQ1, idxQ2, numero);
-    current->der= update(current->der,mitad+1,j,idxQ1, idxQ2, numero);
-    current->suma_normal= (current->izq->suma_normal+current->der->suma_normal)%MOD;
+    current->left= update(current->left,i,mid,idxQ1, idxQ2, numero);
+    current->right= update(current->right,mid+1,j,idxQ1, idxQ2, numero);
+    current->sum= (current->left->sum+current->right->sum)%MOD;
   
