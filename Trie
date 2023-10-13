@@ -1,0 +1,46 @@
+const int K = 26;
+
+struct Vertex {
+    int next[K];
+    bool isWord = false;
+
+    Vertex() {
+        fill(begin(next), end(next), -1);
+    }
+};
+
+vector<Vertex> trie(1);
+
+void add_string(string const& s) {
+    int v = 0;
+    for (char ch : s) {
+        int c = ch - 'a';
+        if (trie[v].next[c] == -1) {
+            trie[v].next[c] = trie.size();
+            trie.emplace_back();
+        }
+        v = trie[v].next[c];
+    }
+    trie[v].isWord = true;
+}
+
+ll dp[5005];
+string S;
+ll mod = 1e9+7;
+
+int walk(const string &S, int N, int i){
+    int trie_idx = 0;
+    int c = 0;
+    int words = 0;
+    for(int k=i; k<N; k++){
+        c = S[k] - 'a';
+        if(trie[trie_idx].next[c] == -1)return words;
+        trie_idx = trie[trie_idx].next[c];
+        if(trie[trie_idx].isWord){
+            words = (words + dp[k+1])%mod;
+        }
+    }
+    return words%mod;
+}
+
+// Given a list of words, return the number of ways you can create a string using the words.
