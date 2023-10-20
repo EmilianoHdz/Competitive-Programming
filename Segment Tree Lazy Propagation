@@ -1,78 +1,98 @@
-#include <bits/stdc++.h>
-
-using namespace std;
-
-#define ll long long
-
-const ll MOD = (ll)1e9+7;
-
 struct segmentTree{
-    ll sum;
-    ll lazy;
+    long long value;
+    long long lazy;
     segmentTree *left, *right;
     segmentTree(){
-        ll sum = 0;
-        ll lazy = 0;
-        left = nullptr;
-        right = nullptr;
+        value=0;
+        lazy=0;
+        left=nullptr;
+        right=nullptr;
     }
 };
-
-segmentTree* build(ll i, ll j, ll arreglo[]){
-    segmentTree *root = new segmentTree();
-    root->lazy=0;
+ 
+segmentTree* build(int i, int j, int arreglo[]){
+    segmentTree *root=new segmentTree();
     if(i==j){
-        root->sum = (arreglo[i]%MOD);
+        root->value=arreglo[i];
         return root;
     }
-    ll mid = (i+j)/2;
-    root->left = build(i,mid,arreglo);
-    root->right = build(mid+1,j,arreglo);
-    root->sum = (root->left->sum + root->right->sum)%MOD;
+    int mitad=(i+j)/2;
+    root->left=build(i,mitad,arreglo);
+    root->right=build(mitad+1,j,arreglo);
+    root->value=root->left->value+root->right->value;
     return root;
 }
-
-long long answer(segmentTree *current, ll i, ll j, const ll idxQ1, const ll idxQ2){
+ 
+long long answer(segmentTree *current, int i, int j, int idxQ1, int idxQ2){
     if(i>idxQ2 || j<idxQ1)return 0;
-    if(i>=idxQ1 && j<=idxQ2){
-        return (current->sum)%MOD;
-    }
-    ll mid=(i+j)/2;
+    if(i>=idxQ1 && j<=idxQ2)return current->value;
+    int mitad=(i+j)/2;
     if(current->lazy>0){
-        if(current->left!= nullptr){
-            current->left->sum = (current->left->sum+((mid-i+1)*current->lazy)%MOD)%MOD;
-            current->left->lazy = (current->left->lazy+current->lazy)%MOD;
+        if(current->left!=nullptr){
+            current->left->value+=(mitad-i+1)*current->lazy;
+            current->left->lazy+=current->lazy;
         }
-        if(current->right!= nullptr){
-            current->right->sum = (current->right->sum + ((j-(mid+1)+1)*current->lazy)%MOD)%MOD;
-            current->right->lazy = (current->right->lazy +current->lazy)%MOD;
+        if(current->right!=nullptr){
+            current->right->value+=(j-(mitad+1)+1)*current->lazy;
+            current->right->lazy+=current->lazy;
         }
         current->lazy=0;
-
     }
-    return (answer(current->left,i,mid,idxQ1,idxQ2) + answer(current->right,mid+1,j,idxQ1,idxQ2))%MOD;
+    return answer(current->left,i,mitad,idxQ1,idxQ2)+answer(current->right,mitad+1,j,idxQ1,idxQ2);
 }
-
-segmentTree* update(segmentTree* current, ll i, ll j, const ll idxQ1, const ll idxQ2, const ll numero){
-    if(i>idxQ2 || j<idxQ1) return current;
-    if(i>=idxQ1 && j<=idxQ2){
-        current->sum = (current->sum + ((j-i+1)*numero)%MOD)%MOD;
-        current->lazy = (current->lazy + numero)%MOD;
+ 
+segmentTree* update(segmentTree* current ,int i, int j, int idxUpdate1, int idxUpdate2, int numero){
+    if(i>idxUpdate2 || j<idxUpdate1)return current;//si se sale de los limites
+    if(i==j && i>=idxUpdate1 && i<=idxUpdate2){
+        current->value+=numero;
         return current;
     }
-    ll mid = (i+j)/2;
+    if(i>=idxUpdate1 && j<=idxUpdate2){
+        current->value+=(j-i+1)*numero;
+        current->lazy+=numero;
+        return current;
+    }
+    int mitad=(i+j)/2;
+    //Bajar el lazy a mis hijos si es necesario
     if(current->lazy>0){
-        if(current->left != nullptr){
-            current->left->sum = (current->left->suml + ((mid-i+1)*current->lazy)%MOD)%MOD;
-            current->left->lazy = (current->left->lazy + current->lazy)%MOD;
+        if(current->left!=nullptr){
+            current->left->value+=(mitad-i+1)*current->lazy;
+            current->left->lazy+=current->lazy;
         }
-        if(current->right != nullptr){
-            current->right->sum = (current->right->sum + ((j-(mid+1)+1)*current->lazy)%MOD)%MOD;
-            current->right->lazy = (current->right->lazy + current->lazy)%MOD;
+        if(current->right!=nullptr){
+            current->right->value+=(j-(mitad+1)+1)*current->lazy;
+            current->right->lazy+=current->lazy;
         }
         current->lazy=0;
     }
-    current->left= update(current->left,i,mid,idxQ1, idxQ2, numero);
-    current->right= update(current->right,mid+1,j,idxQ1, idxQ2, numero);
-    current->sum= (current->left->sum+current->right->sum)%MOD;
-  
+    //-------
+    current->left=update(current->left,i,mitad,idxUpdate1,idxUpdate2,numero);
+    current->right=update(current->right,mitad+1,j,idxUpdate1,idxUpdate2,numero);
+    return current;
+}
+ 
+int main(){
+    int n,q;
+    cin>>n>>q;
+    int arreglo[n];
+    for(int i=0; i<n; i++){
+        cin>>arreglo[i];
+    }
+    segmentTree *root=build(0,n-1,arreglo);
+    while(q--){
+        int a;
+        cin>>a;
+        if(a==1){
+            int b,c,d;
+            cin>>b>>c>>d;
+            b--;
+            c--;
+            update(root,0,n-1,b,c,d);
+        }else{
+            int b;
+            cin>>b;
+            b--;
+            cout<<answer(root,0,n-1,b,b)<<'\n';
+        }
+    }
+    return 0;
