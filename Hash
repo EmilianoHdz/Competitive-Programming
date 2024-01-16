@@ -1,0 +1,6 @@
+// Where prime is p^x and x is an integer.
+
+ll mod = 1e9+7;
+
+int computeHash(ll prime, char c){
+    return ((c - 'a' + 1) * prime) % mod;
