@@ -1,0 +1,8 @@
+void pre(){
+    catalanNumbers[1] = 1;
+    for(ll i=2; i<maxN; i++){
+        catalanNumbers[i] = ( ( ((2*i) * (2*i-1))%MOD)*catalanNumbers[i-1])%MOD;
+        ll dividendo = ((i+1)*i)%MOD;
+        catalanNumbers[i] = (catalanNumbers[i] * inverso_modular(dividendo))%MOD;
+    }
+}
