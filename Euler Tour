@@ -1,0 +1,9 @@
+int timer = 0;
+ 
+void euler_tour(const vector<vector<int>> &adj_list, vector<int> &start, vector<int> &endd, int from, int prev) {
+	start[from] = timer++;
+	for (int to : adj_list[from]) {
+		if (to != prev) { euler_tour(adj_list, start, endd, to, from); }
+	}
+	endd[from] = timer;
+}
