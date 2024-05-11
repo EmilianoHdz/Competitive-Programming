@@ -1,5 +1,5 @@
 // Where prime is p^x and x is an integer.
-
+// P is equals to 31
 ll mod = 1e9+7;
 
 int computeHash(ll prime, char c){
